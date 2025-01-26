@@ -1,0 +1,7 @@
+@media (min-width: 768px) {
+    .graphData {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        column-gap: 1fr;
+    }
+}

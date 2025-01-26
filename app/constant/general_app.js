@@ -1,0 +1,2 @@
+// export const CORRECTION_RATE_VALUE = 2.12110930136;
+// export const MAX_CONCURRENT_CALLS = 5;

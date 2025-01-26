@@ -1,0 +1,60 @@
+.container {
+    background-color: rgba(2, 21, 38, 0.95);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index: 999;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.progressText {
+    position: absolute;
+    font-weight: bold;
+    font-size: 24px;
+    color: lightgray;
+}
+
+.statsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    font-size: 12px;
+    color: lightgrey;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+
+.statsContainer > div {
+    display: flex;
+    justify-content: space-between;   
+    font-size: 14px; 
+}
+
+@media (min-width: 768px) {
+    .container {
+        position: sticky;
+        top: 0;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        padding-bottom: 1rem;
+        top: 17rem;
+        z-index: -1;
+    }
+}

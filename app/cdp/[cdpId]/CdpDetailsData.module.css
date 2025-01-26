@@ -1,0 +1,45 @@
+.listData {
+    display: grid;
+    row-gap: .5rem;
+    grid-template-columns: 1fr;
+}
+
+.ownerData {
+    margin: 1rem 0;
+}
+
+.data {
+    position: relative;
+    border-radius: 10px;
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    overflow-wrap: anywhere;
+}
+
+.data > span {
+    color: #ffffff;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 10px;
+}
+
+.data > div {
+    font-size: 18px;
+    color: #ffffff;
+}
+
+@media (min-width: 484px) {
+    .listData {
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: .5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .listData {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
