@@ -2,10 +2,21 @@ import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import styles from './SearchStatsChart.module.css';
-
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const SearchStatsChart = ({ searchedLowerValue, foundLowerValue, searchedGreaterValue, foundGreaterValue }) => {
+interface SearchStatsChartProps {
+  searchedLowerValue: number;
+  foundLowerValue: number;
+  searchedGreaterValue: number;
+  foundGreaterValue: number;
+}
+
+const SearchStatsChart: React.FC<SearchStatsChartProps> = ({
+  searchedLowerValue,
+  foundLowerValue,
+  searchedGreaterValue,
+  foundGreaterValue,
+}) => {
   
   const data = {
     labels: ['Lower', 'Greater'],
@@ -28,7 +39,7 @@ const SearchStatsChart = ({ searchedLowerValue, foundLowerValue, searchedGreater
     plugins: {
       tooltip: {
         callbacks: {
-          label: (tooltipItem) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}`,
+          label: (tooltipItem: any) => `${tooltipItem.dataset.label}: ${tooltipItem.raw}`,
         },
       },
     },

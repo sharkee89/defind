@@ -1,0 +1,29 @@
+.signatureContainer {
+    display: flex;
+    justify-content: center;
+    width: 96% !important;
+    margin: 0 auto;
+}
+.signature {
+    margin: 1em 0;
+    overflow-wrap: anywhere;
+}
+.button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    background-color: #659287;
+    color: #fff;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    outline: none;
+} 
+.button:disabled {
+    background-color: #344CB7;
+    cursor: not-allowed;
+} 
+.buttonText {
+    font-size: 18px;
+}

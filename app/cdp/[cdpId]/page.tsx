@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import BN from 'bn.js';
+import Signature from './Signature';
 import { useWeb3 } from '../../hooks/useWeb3';
 import { utils } from '@defisaver/tokens';
 import { COINGECKO_API_URL, DEFAULT_ILK_LABEL } from '../../constant/general_app';
@@ -22,9 +23,12 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
   const [cdpId, setCdpId] = useState<number | null>(null);
   const [cdpData, setCdpData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [signature, setSignature] = useState<any>(null);
   const [collateralPrices, setCollateralPrices] = useState<any>(null);
   const { web3, account } = useWeb3();
+
+  useLayoutEffect(() => {
+    fetchCollateralPrices();
+  }, []);
 
   useEffect(() => {
     const unwrapParams = async () => {
@@ -33,10 +37,6 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
     };
     unwrapParams();
   }, [params]);
-
-  useEffect(() => {
-    fetchCollateralPrices();
-  }, []);
 
   useEffect(() => {
     fetchCdpData();
@@ -63,7 +63,6 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
       if (!ilkRateData || !ilkRateData.rate) {
         throw new Error('Failed to fetch ilk rate data');
       }
-
       const rate = new BN(ilkRateData.rate);
       const adjustedDebt = useCalculateAdjustedDebt(web3, data.debt, rate);
       const collateralType = COLLATERAL_TYPES.find(type => type.value === utils.bytesToString(data.ilk));
@@ -79,69 +78,32 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
       setLoading(false);
     }
   };
-
-  const signMessage = async () => {
-    if (!web3 || !account) {
-      alert('Please connect to MetaMask first.');
-      return;
-    }
-
-    const message = 'Ovo je moj CDP';
-
-    try {
-      const signedMessage = await web3.eth.personal.sign(message, account, '');
-      setSignature(signedMessage);
-    } catch (error) {
-      console.error('Error signing the message:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div>
-        <div className="background_overlay"></div>
-        <span className={styles.loading}>
-          <FontAwesomeIcon icon={faSpinner} />
-        </span>
-      </div>
-    );
-  }
-
-  if (!cdpData) {
-    return (
-      <div>
-        <p className={`title ${styles.noData}`}>No data found for CDP {cdpId}</p>
-        <div className="background_overlay"></div>
-      </div>
-    );
-  }
-
-  return (
+  const renderOverlay = (content: React.ReactNode) => (
     <div>
       <div className="background_overlay"></div>
-      <div className={styles.cdpDetailsData}>
-        <CdpDetailsData cdpId={cdpId ? cdpId.toString() : ''} cdpData={cdpData} />
-        <CdpDetailGraph cdpData={cdpData} />
-        <div className={styles.signMessageContainer}>
-          {!signature && (
-            <button onClick={signMessage} className={styles.button}>
-              Ovo je moj CDP
-            </button>
-          )}
-          {signature && (
-            <div className={`title ${styles.signatureContainer}`}>
-              <div className={styles.signature}>
-                  <div className={styles.signatureDisplay}>
-                    <h3>Signed Message:</h3>
-                    <p>{signature}</p>
-                  </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      {content}
     </div>
   );
+  if (loading) {
+    return renderOverlay(
+      <span className={styles.loading}>
+        <FontAwesomeIcon icon={faSpinner} />
+      </span>
+    );
+  }
+  if (!cdpData) {
+    return renderOverlay(
+      <p className={`title ${styles.noData}`}>No data found for CDP {cdpId}</p>
+    );
+  }
+  return renderOverlay(
+    <div className={styles.cdpDetailsData}>
+      <CdpDetailsData cdpId={cdpId ? cdpId.toString() : ''} cdpData={cdpData} />
+      <CdpDetailGraph cdpData={cdpData} />
+      {web3 && account && <Signature web3={web3} account={account} />}
+    </div>
+  );
+
 };
 
 export default CdpDetails;

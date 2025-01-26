@@ -66,7 +66,6 @@ const CdpDetailGraph: React.FC<CdpDetailGraphProps> = ({ cdpData }) => {
                 },
             },
         };
-
         const options_debt = {
             responsive: true,
             plugins: {
@@ -85,17 +84,17 @@ const CdpDetailGraph: React.FC<CdpDetailGraphProps> = ({ cdpData }) => {
                 },
             },
         };
-  return (
-    <div className={styles.graphData}>
-        <div className={styles.chartContainer}>
-            <Bar data={collateralData} options={options} />
-        </div>
+    return (
+        <div className={styles.graphData}>
+            <div className={styles.chartContainer}>
+                <Bar data={collateralData} options={options} />
+            </div>
 
-        <div className={styles.chartContainer}>
-            <Bar data={debtData} options={options_debt} />
+            <div className={styles.chartContainer}>
+                <Bar data={debtData} options={options_debt} />
+            </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default CdpDetailGraph

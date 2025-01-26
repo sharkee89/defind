@@ -99,8 +99,6 @@ const CdpForm: React.FC<CdpFormProps> = ({
               </div>
             ))}
           </div>
-
-          {/* <button onClick={stopAndResetCdpSearch}>stop</button> */}
         </div>
       </div>
     </div>
