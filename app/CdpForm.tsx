@@ -47,6 +47,10 @@ const CdpForm: React.FC<CdpFormProps> = ({
     }
   };
 
+  const handleStopAndReset = () => {
+    stopAndResetCdpSearch(true);
+  };
+
   useEffect(() => {
     if (debouncedQuery) {
       stopAndResetCdpSearch(true);
@@ -102,6 +106,11 @@ const CdpForm: React.FC<CdpFormProps> = ({
             ))}
           </div>
         </div>
+      </div>
+      <div className={styles.buttonWrapper}>
+        <button onClick={handleStopAndReset} className={styles.resetButton}>
+          Reset
+        </button>
       </div>
     </div>
   );
