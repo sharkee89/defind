@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Buffer } from 'buffer';
 import CdpForm from './CdpForm';
 import CdpList from './CdpList';
@@ -11,14 +11,13 @@ import styles from './CdpListPage.module.css';
 import { useCdp } from './hooks/useCdp';
 import { useWeb3 } from './hooks/useWeb3';
 import type { RootState } from './redux/store';
-import { useSelector } from 'react-redux';
-
-window.Buffer = Buffer;
+import { useSelector, useDispatch } from 'react-redux';
+import { updateIlk } from './redux/reducers/appSlice';
 
 const CdpListPage: React.FC = () => {
-  const {web3, account, error, setError, contract, ilksContract, initialized} = useWeb3();
+  const { web3, account, error, setError, contract, ilksContract, initialized } = useWeb3();
   const cdpId = useSelector((state: RootState) => state.app.cdpId);
-  const [selectedIlk, setSelectedIlk] = useState<string>('ETH-A');
+  const selectedIlk = useSelector((state: RootState) => state.app.ilk);
   const {
     closestCdps,
     getClosestCdps,
@@ -31,8 +30,9 @@ const CdpListPage: React.FC = () => {
     foundGreaterValue,
     jsonRpcCalled,
   } = useCdp(web3!, cdpId, selectedIlk, contract, ilksContract, setError);
+  const dispatch = useDispatch();
   const handleIlkChange = (event: string) => {
-    setSelectedIlk(event);
+    dispatch(updateIlk(event));
   };
 
   const closeErrorPopup = () => {
@@ -40,6 +40,9 @@ const CdpListPage: React.FC = () => {
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.Buffer = Buffer;
+    }
     return () => {
       stopAndResetCdpSearch(false);
     };

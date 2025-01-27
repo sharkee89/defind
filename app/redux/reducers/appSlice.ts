@@ -10,6 +10,7 @@ interface CdpState {
   foundGreaterValue: number;
   cdpId: number;
   closestCdps: Array<any>;
+  ilk: string;
 }
 
 const initialState: CdpState = {
@@ -21,6 +22,7 @@ const initialState: CdpState = {
   foundGreaterValue: 0,
   cdpId: 1,
   closestCdps: [],
+  ilk: 'ETH-A',
 };
 
 const appSlice = createSlice({
@@ -33,41 +35,37 @@ const appSlice = createSlice({
     incrementJsonRpcCalled: (state: CdpState) => {
       state.jsonRpcCalled += 1;
     },
-    clearJsonRpcCalled: (state: CdpState) => {
+    clearLoadingParams: (state: CdpState) => {
       state.jsonRpcCalled = 0;
-    },
-    incrementSearchedLowerValue: (state: CdpState) => {
-      state.searchedLowerValue += 1;
-    },
-    clearSearchedLowerValue: (state: CdpState) => {
       state.searchedLowerValue = 0;
+      state.foundLowerValue = 0;
+      state.searchedGreaterValue = 0;
+      state.foundGreaterValue = 0;
+    },
+    incrementSearchedLowerValueAndGreaterValue: (state: CdpState) => {
+      state.searchedLowerValue += 1;
+      state.searchedGreaterValue += 1;
     },
     incrementFoundLowerValue: (state: CdpState) => {
       state.foundLowerValue += 1;
     },
-    clearFoundLowerValue: (state: CdpState) => {
-      state.foundLowerValue = 0;
-    },
     incrementSearchedGreaterValue: (state: CdpState) => {
       state.searchedGreaterValue += 1;
     },
-    clearSearchedGreaterValue: (state: CdpState) => {
-      state.searchedGreaterValue = 0;
-    },
     incrementFoundGreaterValue: (state: CdpState) => {
       state.foundGreaterValue += 1;
-    },
-    clearFoundGreaterValue: (state: CdpState) => {
-      state.foundGreaterValue = 0;
     },
     updateClosestCdps: (state: CdpState, action: PayloadAction<Array<CpdListItem>>) => {
       state.closestCdps = action.payload;
     },
     addCdp: (state: CdpState, action: PayloadAction<CpdListItem>) => {
       state.closestCdps.push(action.payload);
-    },
+    }, 
     updateCdpId: (state: CdpState, action: PayloadAction<number>) => {
       state.cdpId = action.payload
+    },
+    updateIlk: (state: CdpState, action: PayloadAction<string>) => {
+      state.ilk = action.payload
     }
   },
 });
@@ -75,17 +73,14 @@ const appSlice = createSlice({
 export const {
   updateProgress,
   incrementJsonRpcCalled,
-  clearJsonRpcCalled,
-  incrementSearchedLowerValue,
-  clearSearchedLowerValue,
+  clearLoadingParams,
+  incrementSearchedLowerValueAndGreaterValue,
   incrementFoundLowerValue,
-  clearFoundLowerValue,
   incrementSearchedGreaterValue,
-  clearSearchedGreaterValue,
   incrementFoundGreaterValue,
-  clearFoundGreaterValue,
   updateClosestCdps,
   addCdp,
-  updateCdpId
+  updateCdpId,
+  updateIlk
 } = appSlice.actions;
 export default appSlice.reducer;

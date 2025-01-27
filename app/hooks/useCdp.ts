@@ -9,15 +9,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useCalculateAdjustedDebt } from './useCalculateAdjustedDebt';
 import {
   updateProgress,
-  clearJsonRpcCalled,
+  clearLoadingParams,
   incrementJsonRpcCalled,
-  clearSearchedLowerValue,
-  incrementSearchedLowerValue,
-  clearFoundLowerValue,
+  incrementSearchedLowerValueAndGreaterValue,
   incrementFoundLowerValue,
-  clearSearchedGreaterValue,
   incrementSearchedGreaterValue,
-  clearFoundGreaterValue,
   incrementFoundGreaterValue,
   addCdp,
   updateClosestCdps
@@ -136,8 +132,7 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
           if (lowerCdpId >= 0) {
             lowerData = cdpData[0];
             upperData = cdpData[1];
-            dispatch(incrementSearchedLowerValue());
-            dispatch(incrementSearchedGreaterValue());
+            dispatch(incrementSearchedLowerValueAndGreaterValue());
             found = await processCdpData(lowerCdpId, lowerData, rate, closestCdpsList, closestCdps, found);
           } else {
             upperData = cdpData[0];
@@ -167,11 +162,7 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
   const resetSearchState = () => {
     dispatch(updateProgress(0));
     dispatch(updateClosestCdps([]));
-    dispatch(clearJsonRpcCalled());
-    dispatch(clearSearchedLowerValue());
-    dispatch(clearFoundLowerValue());
-    dispatch(clearSearchedGreaterValue());
-    dispatch(clearFoundGreaterValue());
+    dispatch(clearLoadingParams());
   };
 
   const stopAndResetCdpSearch = (reset: boolean) => {
