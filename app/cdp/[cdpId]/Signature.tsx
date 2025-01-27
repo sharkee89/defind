@@ -33,7 +33,7 @@ const Signature: React.FC<SignatureDataProps> = ({ web3, account }) => {
             </button>
             )}
             {signature && (
-            <div className={`title ${styles.signatureContainer}`}>
+            <div className={styles.signatureContainer}>
                 <div className={styles.signature}>
                     <div className={styles.signatureDisplay}>
                     <h3>Signed Message:</h3>

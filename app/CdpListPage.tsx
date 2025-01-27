@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Buffer } from 'buffer';
 import CdpForm from './CdpForm';
 import CdpList from './CdpList';
@@ -38,6 +38,12 @@ const CdpListPage: React.FC = () => {
   const closeErrorPopup = () => {
     setError(null);
   };
+
+  useEffect(() => {
+    return () => {
+      stopAndResetCdpSearch(false);
+    };
+  }, []);
 
   return (
     <div className={styles.container}>

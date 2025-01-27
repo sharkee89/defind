@@ -5,7 +5,7 @@ import BN from 'bn.js';
 import Signature from './Signature';
 import { useWeb3 } from '../../hooks/useWeb3';
 import { utils } from '@defisaver/tokens';
-import { COINGECKO_API_URL, DEFAULT_ILK_LABEL } from '../../constant/general_app';
+import { DEFAULT_ILK_LABEL, FETCH_COLLATERAL_PRICES_API } from '../../constant/general_app';
 import { CDP_INFO_ABI, COLLATERAL_TYPES, CONTRACT_ADDRESS, ILKS_ABI, ILKS_CONTRACT_ADDRESS } from '../../constant/contract';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import CdpDetailsData from './CdpDetailsData';
@@ -44,7 +44,7 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
 
   const fetchCollateralPrices = async () => {
     try {
-      const response = await fetch(COINGECKO_API_URL);
+      const response = await fetch(FETCH_COLLATERAL_PRICES_API);
       const data = await response.json();
       setCollateralPrices(data);
     } catch (error) {
@@ -78,12 +78,14 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
       setLoading(false);
     }
   };
+
   const renderOverlay = (content: React.ReactNode) => (
     <div>
       <div className="background_overlay"></div>
       {content}
     </div>
   );
+
   if (loading) {
     return renderOverlay(
       <span className={styles.loading}>
@@ -91,11 +93,13 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
       </span>
     );
   }
+
   if (!cdpData) {
     return renderOverlay(
       <p className={`title ${styles.noData}`}>No data found for CDP {cdpId}</p>
     );
   }
+
   return renderOverlay(
     <div className={styles.cdpDetailsData}>
       <CdpDetailsData cdpId={cdpId ? cdpId.toString() : ''} cdpData={cdpData} />
@@ -103,7 +107,6 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
       {web3 && account && <Signature web3={web3} account={account} />}
     </div>
   );
-
 };
 
 export default CdpDetails;

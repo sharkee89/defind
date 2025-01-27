@@ -63,7 +63,6 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
   };
 
   const getClosestCdps = async () => {
-    console.log(`Fetching closest CDPs for id: ${cdpId}`);
     resetSearchState();
 
     if (controllerRef.current) {
@@ -116,7 +115,6 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
         }
 
         while (found < totalSearch && (lowerCdpId >= 0 || upperCdpId >= 0)) {
-          console.log('Searching for CDPs:', lowerCdpId, upperCdpId);
           const cdpsToCheck: Promise<any>[] = [];
           if (lowerCdpId >= 0) {
             dispatch(incrementJsonRpcCalled());
@@ -152,7 +150,6 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
           await new Promise((resolve) => setTimeout(resolve, 100));
 
           if (controller.signal.aborted) {
-            console.log('Search aborted in the while loop.');
             break;
           }
         }
@@ -176,11 +173,13 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
     dispatch(clearFoundGreaterValue());
   };
 
-  const stopAndResetCdpSearch = () => {
+  const stopAndResetCdpSearch = (reset: boolean) => {
     if (controllerRef.current) {
       controllerRef.current.abort();
     }
-    resetSearchState();
+    if (reset) {
+      resetSearchState();
+    }
     promisesQueue.current = [];
     setIsLoading(false);
   };

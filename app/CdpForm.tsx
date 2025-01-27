@@ -8,7 +8,7 @@ import { updateCdpId } from './redux/reducers/appSlice';
 interface CdpFormProps {
   cdpId: string;
   selectedIlk: string;
-  stopAndResetCdpSearch: () => void;
+  stopAndResetCdpSearch: (reset: boolean) => void;
   handleIlkChange: (ilk: string) => void;
   getClosestCdps: () => void;
   isLoading: boolean;
@@ -46,8 +46,7 @@ const CdpForm: React.FC<CdpFormProps> = ({
 
   useEffect(() => {
     if (debouncedQuery) {
-      console.log('Searching for:', debouncedQuery);
-      stopAndResetCdpSearch();
+      stopAndResetCdpSearch(true);
       getClosestCdps();
     }
   }, [debouncedQuery]);

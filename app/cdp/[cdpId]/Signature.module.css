@@ -1,8 +1,12 @@
 .signatureContainer {
     display: flex;
+    margin: 1rem auto;
     justify-content: center;
     width: 96% !important;
-    margin: 0 auto;
+    background: rgba(255, 255, 255, .1);
+    border: 1px solid #ffeb00;
+    border-radius: 50px;
+    padding: 1rem;
 }
 .signature {
     margin: 1em 0;
