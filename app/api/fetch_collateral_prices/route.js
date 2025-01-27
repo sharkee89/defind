@@ -1,4 +1,4 @@
-import { COINGECKO_API_URL } from "../../constant/general_app";
+import { COINGECKO_API_URL, HARDCODED_PRICE } from "../../constant/general_app";
 
 export async function GET() {
     try {
@@ -9,8 +9,8 @@ export async function GET() {
             headers: { 'Content-Type': 'application/json' }
     });
     } catch (error) {
-        console.error('Error fetching collateral prices:', error);
-        return new Response(JSON.stringify({ error: 'Failed to fetch collateral prices' + error }), {
+        console.error('Get hardcoded prices:', error);
+        return new Response(JSON.stringify(HARDCODED_PRICE), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });

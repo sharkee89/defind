@@ -3,6 +3,7 @@ import BN from 'bn.js';
 import Web3 from 'web3';
 import { utils } from '@defisaver/tokens';
 import { MAX_CONCURRENT_CALLS } from '../constant/general_app';
+import { ILK } from '../constant/contract';
 import type { RootState } from '../redux/store';
 import { useSelector, useDispatch } from 'react-redux';
 import { useCalculateAdjustedDebt } from './useCalculateAdjustedDebt';
@@ -89,7 +90,7 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
         const data = await getCdpInfo(cdpId, contract, controller);
         if (!data) return;
 
-        const ilkRateData = await getIlkRate(data.ilk, ilksContract, controller);
+        const ilkRateData = await getIlkRate(ILK, ilksContract, controller);
         if (!ilkRateData) return;
 
         const rate = new BN(ilkRateData.rate);

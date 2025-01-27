@@ -4,10 +4,9 @@ interface CollateralType {
   liquidationRatio: number;
   priceLabel: string;
 }
-
 export const CONTRACT_ADDRESS = '0x68C61AF097b834c68eA6EA5e46aF6c04E8945B2d';
+export const ILK = '0x4554482d41000000000000000000000000000000000000000000000000000000';
 export const ILKS_CONTRACT_ADDRESS = '0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b';
-
 export const CDP_INFO_ABI = [
   {
     "inputs": [{ "internalType": "address", "name": "owner", "type": "address" }],
@@ -31,7 +30,6 @@ export const CDP_INFO_ABI = [
     "type": "function",
   },
 ];
-
 export const ILKS_ABI = [
   {
     "inputs": [{ "internalType": "bytes32", "name": "ilk", "type": "bytes32" }],
@@ -45,7 +43,6 @@ export const ILKS_ABI = [
     "type": "function",
   },
 ];
-
 export const COLLATERAL_TYPES: CollateralType[] = [
   { value: 'ETH-A', label: 'ETH-A', liquidationRatio: 145, priceLabel: 'ethereum' },
   { value: 'WBTC-A', label: 'WBTC-A', liquidationRatio: 145, priceLabel: 'wrapped-bitcoin' },
