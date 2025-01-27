@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useLayoutEffect } from 'react';
-import BN from 'bn.js';
 import Signature from './Signature';
 import { useWeb3 } from '../../hooks/useWeb3';
 import { utils } from '@defisaver/tokens';
@@ -17,7 +16,6 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import '../../../public/style.css';
 import { useCalculateAdjustedDebt } from '../../hooks/useCalculateAdjustedDebt';
 import CdpDetail from '../CdpDetail';
-import { IlkRateData } from '../../types/app.type';
 
 const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
   const [cdpId, setCdpId] = useState<number | null>(null);
@@ -57,14 +55,8 @@ const CdpDetails = ({ params }: { params: { cdpId: number } }) => {
 
     try {
       const contract = new web3.eth.Contract(CDP_INFO_ABI, CONTRACT_ADDRESS);
-      const ilksContract = new web3.eth.Contract(ILKS_ABI, ILKS_CONTRACT_ADDRESS);
       const data: { ilk: string; debt: number; collateral: string; owner: string } = await contract.methods.getCdpInfo(cdpId).call();
-      const ilkRateData: IlkRateData = await ilksContract.methods.ilks(ILK).call();
-      if (!ilkRateData || !ilkRateData.rate) {
-        throw new Error('Failed to fetch ilk rate data');
-      }
-      const rate = new BN(ilkRateData.rate);
-      const adjustedDebt = useCalculateAdjustedDebt(web3, data.debt, rate);
+      const adjustedDebt = await useCalculateAdjustedDebt(web3, data.debt);
       const collateralType = COLLATERAL_TYPES.find(type => type.value === utils.bytesToString(data.ilk));
       const liquidationRatioDisplay = collateralType ? collateralType.liquidationRatio : 0;
       const liquidationRatio = liquidationRatioDisplay / 100;

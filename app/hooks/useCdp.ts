@@ -100,7 +100,7 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
           utils.bytesToString(data.ilk) === selectedIlk);
 
         if (validData) {
-          let adjustedDebtInEther = useCalculateAdjustedDebt(web3, data.debt, rate);
+          let adjustedDebtInEther = await useCalculateAdjustedDebt(web3, data.debt);
           const cdp: CpdListItem = {
             id: cdpId,
             urn: data.urn,
@@ -138,12 +138,12 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
             upperData = cdpData[1];
             dispatch(incrementSearchedLowerValue());
             dispatch(incrementSearchedGreaterValue());
-            found = processCdpData(lowerCdpId, lowerData, rate, closestCdpsList, closestCdps, found);
+            found = await processCdpData(lowerCdpId, lowerData, rate, closestCdpsList, closestCdps, found);
           } else {
             upperData = cdpData[0];
             dispatch(incrementSearchedGreaterValue());
           }
-          found = processCdpData(upperCdpId, upperData, rate, closestCdpsList, closestCdps, found);
+          found = await processCdpData(upperCdpId, upperData, rate, closestCdpsList, closestCdps, found);
           dispatch(updateProgress(Math.round((found / totalSearch) * 100)));
           lowerCdpId--;
           upperCdpId++;
@@ -185,7 +185,7 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
     setIsLoading(false);
   };
 
-  const processCdpData = (
+  const processCdpData = async (
     cdpIdToCheck: number,
     data: CdpData,
     rate: BN,
@@ -200,7 +200,7 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
 
     if (validData && !closestCdpsList.has(cdpIdToCheck)) {
       closestCdpsList.add(cdpIdToCheck);
-      const adjustedDebtInEther = useCalculateAdjustedDebt(web3, data.debt, rate);
+      const adjustedDebtInEther = await useCalculateAdjustedDebt(web3, data.debt);
       const cdp = {
         id: cdpIdToCheck,
         urn: data.urn,
