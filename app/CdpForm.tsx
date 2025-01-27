@@ -21,7 +21,7 @@ interface InputChangeEventTarget {
 }
 
 interface InputChangeEvent {
-  target: InputChangeEventTarget
+  target: InputChangeEventTarget;
 }
 
 const CdpForm: React.FC<CdpFormProps> = ({
@@ -40,8 +40,11 @@ const CdpForm: React.FC<CdpFormProps> = ({
   };
 
   const handleChange = (e: InputChangeEvent) => {
-    setQuery(e.target.value);
-    dispatch(updateCdpId(e.target.value));
+    const value = e.target.value;
+    if (value === '' || /^[0-9]*$/.test(value)) {
+      setQuery(value);
+      dispatch(updateCdpId(value));
+    }
   };
 
   useEffect(() => {
@@ -61,14 +64,14 @@ const CdpForm: React.FC<CdpFormProps> = ({
 
       <div className={styles.formGroup}>
         <div className={styles.inputField}>
-        <input
-          type="text"
-          placeholder="Enter CDP ID"
-          value={query}
-          onChange={handleChange}
-          className={`${styles.input} ${styles.inputField}`}
-          min="1"
-        />
+          <input
+            type="text"
+            placeholder="Enter CDP ID"
+            value={query}
+            onChange={handleChange}
+            className={`${styles.input} ${styles.inputField}`}
+            min="1"
+          />
         </div>
 
         <div className={styles.dropdownWrapper}>
