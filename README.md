@@ -23,7 +23,10 @@ Defind is a small nextjs application about searching collaterized debt positions
 
 ## Use
 Use is able to input a cdpId number into input field on the home page and after that to wait for application to find the closest 20 cdp by id based on input value data.
+![Logo](./images/cdp_list_page.png)
 
 Every cdp found is having a detail page where more data about collaterized debt position are displayed.
+![Logo](./images/cdp_detail_page.png)
 
 On detail page user is available to sign the message via metamask browser extension for digital wallet data.
+![Logo](./images/cdp_detail_signed_page.png)
