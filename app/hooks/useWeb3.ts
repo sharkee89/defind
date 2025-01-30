@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import detectEthereumProvider from '@metamask/detect-provider';
 import Web3 from 'web3';
 import { utils } from '@defisaver/tokens';
-import { CDP_INFO_ABI, CONTRACT_ADDRESS, ILKS_ABI, ILKS_CONTRACT_ADDRESS } from '../constant/contract';
+import { SCALING_FACTOR, CDP_INFO_ABI, CONTRACT_ADDRESS, ILKS_ABI, ILKS_CONTRACT_ADDRESS } from '../constant/contract';
 import CdpDto from '../cdp/dto/CdpDto';
 
 export const useWeb3 = () => {
@@ -127,7 +127,7 @@ export const useWeb3 = () => {
   }
 
   const getAdjustedDebt = (debt: number, rate: number) => {
-    return parseFloat(getValueFromWei(debt)) * parseFloat(getValueFromWei(rate)) / 1000000000;
+    return parseFloat(getValueFromWei(debt)) * parseFloat(getValueFromWei(rate)) / SCALING_FACTOR;
   }
 
   return {
