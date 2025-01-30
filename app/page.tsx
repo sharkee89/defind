@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import CdpListPage from './CdpListPage';
+import CdpListPage from './components/cdp/CdpListPage';
 import '../public/style.css';
 
 const Index = () => {

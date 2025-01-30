@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import styles from './Signature.module.css';
-import Web3 from 'web3';
+import { useWeb3 } from '../../hooks/useWeb3';
 
 interface SignatureDataProps {
-    web3: Web3,
     account: string
   }
 
-const Signature: React.FC<SignatureDataProps> = ({ web3, account }) => {
+const Signature: React.FC<SignatureDataProps> = ({ account }) => {
     const [signature, setSignature] = useState<any>(null);
+    const { signMessage } = useWeb3();
 
-    const signMessage = async () => {
-        if (!web3 || !account) {
+    const processSignMessage = async () => {
+        if (!account) {
             alert('Please connect to MetaMask first.');
             return;
         }
@@ -19,7 +19,7 @@ const Signature: React.FC<SignatureDataProps> = ({ web3, account }) => {
         const message = 'Ovo je moj CDP';
 
         try {
-            const signedMessage = await web3.eth.personal.sign(message, account, '');
+            const signedMessage = signMessage(message, account);
             setSignature(signedMessage);
         } catch (error) {
             console.error('Error signing the message:', error);
@@ -28,7 +28,7 @@ const Signature: React.FC<SignatureDataProps> = ({ web3, account }) => {
     return (
         <div className={styles.signMessageContainer}>
             {!signature && (
-            <button onClick={signMessage} className={styles.button}>
+            <button onClick={processSignMessage} className={styles.button}>
                 Ovo je moj CDP
             </button>
             )}

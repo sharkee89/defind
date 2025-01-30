@@ -1,24 +1,15 @@
-import Web3 from 'web3';
-import dynamic from 'next/dynamic';
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import styles from './CdpList.module.css';
-import CdpListItem from './CdpListItem';
-
-interface CdpData {
-  id: string;
-  owner: string;
-  collateral: string;
-  debt: number;
-  ilk: string;
-}
+import CdpListItem from './item/CdpListItem';
+import { CdpDtoPlainObject } from '../../../types/app.type';
 
 interface CdpListProps {
-  closestCdps: CdpData[];
-  web3: Web3;
+  closestCdps: CdpDtoPlainObject[];
 }
 
-const CdpList: React.FC<CdpListProps> = ({ closestCdps, web3 }) => {
+const CdpList: React.FC<CdpListProps> = ({ closestCdps }) => {
   const router = useRouter();
 
   const handleCdpClick = (cdpId: string) => {
@@ -35,7 +26,7 @@ const CdpList: React.FC<CdpListProps> = ({ closestCdps, web3 }) => {
 
       <div className={styles.cdpList}>
         {closestCdps.map(cdp => (
-          <CdpListItem key={cdp.id} cdp={cdp} web3={web3} handleCdpClick={handleCdpClick} />
+          <CdpListItem key={cdp.id} cdp={cdp} handleCdpClick={handleCdpClick} />
         ))}
       </div>
     </div>

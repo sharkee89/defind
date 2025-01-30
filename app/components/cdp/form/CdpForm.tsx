@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDebounce } from 'use-debounce';
-import { COLLATERAL_TYPES } from './constant/contract';
+import { COLLATERAL_TYPES } from '../../../constant/contract';
 import styles from './CdpForm.module.css';
 import { useDispatch } from 'react-redux';
-import { updateCdpId } from './redux/reducers/appSlice';
+import { updateCdpId } from '../../../redux/reducers/appSlice';
 
 interface CdpFormProps {
-  cdpId: string;
+  cdpId: number;
   selectedIlk: string;
   stopAndResetCdpSearch: (reset: boolean) => void;
   handleIlkChange: (ilk: string) => void;
@@ -43,7 +43,7 @@ const CdpForm: React.FC<CdpFormProps> = ({
     const value = e.target.value;
     if (value === '' || /^[0-9]*$/.test(value)) {
       setQuery(value);
-      dispatch(updateCdpId(value));
+      dispatch(updateCdpId(parseInt(value)));
     }
   };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './LoadingProperties.module.css';
-import { CIRCLE_RADIUS, STROKE_WIDTH } from './constant/loading_properties';
-import SearchStatsChart from './graph/SearchStatsChart';
+import { CIRCLE_RADIUS, STROKE_WIDTH } from '../../constant/loading_properties';
+import SearchStatsChart from '../../graph/SearchStatsChart';
 
 interface LoadingPropertiesProps {
   isLoading: boolean;

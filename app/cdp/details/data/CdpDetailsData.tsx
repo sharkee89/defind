@@ -1,19 +1,11 @@
 import React from 'react'
 import styles from './CdpDetailsData.module.css';
 import { utils } from '@defisaver/tokens';
+import CdpDetailsDto from '../../dto/CdpDetailsDto';
 
 interface CdpDetailsDataProps {
-  cdpId: string;
-  cdpData: {
-    owner: string;
-    collateral: number;
-    maxCollateralWithoutLiquidation: number;
-    debt: number;
-    maxDebtWithoutLiquidation: number;
-    collateralizationRatio: number;
-    liquidationRatio: number;
-    ilk: string;
-  };
+  cdpId: number;
+  cdpData: CdpDetailsDto;
 }
 
 const CdpDetailsData: React.FC<CdpDetailsDataProps> = ({ cdpId, cdpData }) => {
@@ -24,7 +16,7 @@ const CdpDetailsData: React.FC<CdpDetailsDataProps> = ({ cdpId, cdpData }) => {
         </div>
         <div>
           <div className={`${styles.ownerData} ${styles.data}`}>
-            <div>{cdpData.owner}</div>
+            <div>{cdpData.userAddr}</div>
           </div>
           <div className={styles.listData}>
             <div className={styles.data}>

@@ -1,5 +1,5 @@
+import { CdpDtoPlainObject } from '@/app/types/app.type';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { CpdListItem } from '@/app/types/app.type';
 
 interface CdpState {
   progress: number;
@@ -9,7 +9,7 @@ interface CdpState {
   searchedGreaterValue: number;
   foundGreaterValue: number;
   cdpId: number;
-  closestCdps: Array<any>;
+  closestCdps: Array<CdpDtoPlainObject>;
   ilk: string;
 }
 
@@ -55,10 +55,10 @@ const appSlice = createSlice({
     incrementFoundGreaterValue: (state: CdpState) => {
       state.foundGreaterValue += 1;
     },
-    updateClosestCdps: (state: CdpState, action: PayloadAction<Array<CpdListItem>>) => {
+    updateClosestCdps: (state: CdpState, action: PayloadAction<Array<CdpDtoPlainObject>>) => {
       state.closestCdps = action.payload;
     },
-    addCdp: (state: CdpState, action: PayloadAction<CpdListItem>) => {
+    addCdp: (state: CdpState, action: PayloadAction<any>) => {
       state.closestCdps.push(action.payload);
     }, 
     updateCdpId: (state: CdpState, action: PayloadAction<number>) => {

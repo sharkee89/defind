@@ -1,12 +1,8 @@
 import { useState, useRef } from 'react';
-import BN from 'bn.js';
-import Web3 from 'web3';
+import { RootState } from '../redux/store';
 import { utils } from '@defisaver/tokens';
 import { MAX_CONCURRENT_CALLS } from '../constant/general_app';
-import { ILK } from '../constant/contract';
-import type { RootState } from '../redux/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { useCalculateAdjustedDebt } from './useCalculateAdjustedDebt';
 import {
   updateProgress,
   clearLoadingParams,
@@ -18,9 +14,10 @@ import {
   addCdp,
   updateClosestCdps
 } from '../redux/reducers/appSlice';
-import { Contract, IlkContract, CpdListItem, CdpData } from '../types/app.type';
+import { useWeb3 } from './useWeb3';
+import CdpDto from '../cdp/dto/CdpDto';
 
-export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract: Contract, ilksContract: IlkContract, setError: any) => {
+export const useCdp = (cdpId: number, selectedIlk: string) => {
   const progress = useSelector((state: RootState) => state.app.progress);
   const closestCdps = useSelector((state: RootState) => state.app.closestCdps);
   const jsonRpcCalled = useSelector((state: RootState) => state.app.jsonRpcCalled);
@@ -32,32 +29,8 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const controllerRef = useRef<AbortController | null>(null);
   const promisesQueue = useRef<Promise<any>[]>([]);
-  
-  const getCdpInfo = async (cdpId: number, contract: Contract, controller: AbortController) => {
-    try {
-      return await contract?.methods.getCdpInfo(cdpId).call({ signal: controller.signal });
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.log('Request aborted:', cdpId);
-      } else {
-        console.error(`Error fetching CDP info for ID ${cdpId}:`, error);
-      }
-      return null;
-    }
-  };
-
-  const getIlkRate = async (ilk: string, ilksContract: IlkContract, controller: AbortController) => {
-    try {
-      return await ilksContract?.methods.ilks(ilk).call({ signal: controller.signal });
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.log('Request aborted:', ilk);
-      } else {
-        console.error(`Error fetching ILK rate for ${ilk}:`, error);
-      }
-      return null;
-    }
-  };
+  const [error, setError] = useState<string | null>(null);
+  const { getCdpData } = useWeb3();
 
   const getClosestCdps = async () => {
     resetSearchState();
@@ -69,56 +42,31 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
     controllerRef.current = controller;
 
     try {
-      if (contract && ilksContract && cdpId) {
+      if (cdpId) {
         const startCdpId = Number(cdpId);
         const closestCdpsList = new Set<number>();
         let found = 0;
         const totalSearch = 20;
         setIsLoading(true);
         dispatch(updateProgress(0));
-        let lowerCdpId = startCdpId - 1;
-        let upperCdpId = startCdpId + 1;
-
-        const closestCdps: CpdListItem[] = [];
+        const closestCdps: CdpDto[] = [];
         const promisesQueueLocal: Promise<any>[] = [];
         promisesQueue.current = promisesQueueLocal;
-
-        const data = await getCdpInfo(cdpId, contract, controller);
-        if (!data) return;
-
-        const ilkRateData = await getIlkRate(ILK, ilksContract, controller);
-        if (!ilkRateData) return;
-
-        const rate = new BN(ilkRateData.rate);
-
-        const validData = (new BN(data.collateral).gt(new BN(0)) &&
-          new BN(data.debt).gt(new BN(0)) &&
-          utils.bytesToString(data.ilk) === selectedIlk);
-
-        if (validData) {
-          let adjustedDebtInEther = await useCalculateAdjustedDebt(web3, data.debt);
-          const cdp: CpdListItem = {
-            id: cdpId,
-            urn: data.urn,
-            owner: data.owner,
-            userAddr: data.userAddr,
-            ilk: data.ilk,
-            collateral: web3 ? parseFloat(web3.utils.fromWei(data.collateral, 'ether')).toFixed(2) : 0,
-            debt: adjustedDebtInEther,
-          };
-          closestCdps.push(cdp);
-          dispatch(addCdp(cdp));
-          found++;
+        const cdpItem = await getCdpData(cdpId, controller);
+        if (cdpItem) {
+          found = await processCdpData(cdpItem, cdpId, closestCdpsList, closestCdps, found);
         }
 
+        let lowerCdpId = startCdpId - 1;
+        let upperCdpId = startCdpId + 1;
         while (found < totalSearch && (lowerCdpId >= 0 || upperCdpId >= 0)) {
           const cdpsToCheck: Promise<any>[] = [];
           if (lowerCdpId >= 0) {
             dispatch(incrementJsonRpcCalled());
-            cdpsToCheck.push(contract.methods.getCdpInfo(lowerCdpId).call({ signal: controller.signal }));
+            cdpsToCheck.push(getCdpData(lowerCdpId, controller));
           }
           dispatch(incrementJsonRpcCalled());
-          cdpsToCheck.push(contract.methods.getCdpInfo(upperCdpId).call({ signal: controller.signal }));
+          cdpsToCheck.push(getCdpData(upperCdpId, controller));
           promisesQueueLocal.push(...cdpsToCheck);
 
           if (promisesQueueLocal.length >= MAX_CONCURRENT_CALLS) {
@@ -127,18 +75,18 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
           }
 
           const cdpData = await Promise.all(cdpsToCheck);
-          let lowerData: CdpData;
-          let upperData: CdpData;
+          let lowerData: CdpDto;
+          let upperData: CdpDto;
           if (lowerCdpId >= 0) {
             lowerData = cdpData[0];
             upperData = cdpData[1];
             dispatch(incrementSearchedLowerValueAndGreaterValue());
-            found = await processCdpData(lowerCdpId, lowerData, rate, closestCdpsList, closestCdps, found);
+            found = await processCdpData(lowerData, lowerCdpId, closestCdpsList, closestCdps, found);
           } else {
             upperData = cdpData[0];
             dispatch(incrementSearchedGreaterValue());
           }
-          found = await processCdpData(upperCdpId, upperData, rate, closestCdpsList, closestCdps, found);
+          found = await processCdpData(upperData, upperCdpId, closestCdpsList, closestCdps, found);
           dispatch(updateProgress(Math.round((found / totalSearch) * 100)));
           lowerCdpId--;
           upperCdpId++;
@@ -177,40 +125,24 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
   };
 
   const processCdpData = async (
+    cdpItem: CdpDto,
     cdpIdToCheck: number,
-    data: CdpData,
-    rate: BN,
     closestCdpsList: Set<number>,
-    closestCdps: CpdListItem[],
+    closestCdps: CdpDto[],
     found: number
   ) => {
-    const validData =
-      new BN(data.collateral).gt(new BN(0)) &&
-      new BN(data.debt).gt(new BN(0)) &&
-      utils.bytesToString(data.ilk) === selectedIlk;
-
+    const validData = (cdpItem && cdpItem.collateral > 0 && cdpItem.debt > 0 && utils.bytesToString(cdpItem.ilk) === selectedIlk);
     if (validData && !closestCdpsList.has(cdpIdToCheck)) {
       closestCdpsList.add(cdpIdToCheck);
-      const adjustedDebtInEther = await useCalculateAdjustedDebt(web3, data.debt);
-      const cdp = {
-        id: cdpIdToCheck,
-        urn: data.urn,
-        owner: data.owner,
-        userAddr: data.userAddr,
-        ilk: data.ilk,
-        collateral: web3 ? parseFloat(web3.utils.fromWei(data.collateral, 'ether')).toFixed(2) : 0,
-        debt: adjustedDebtInEther
-      };
-      closestCdps.push(cdp);
-      dispatch(addCdp(cdp));
-      if (cdpIdToCheck < Number(cdpId) && cdpIdToCheck >= 0) {
+      closestCdps.push(cdpItem);
+      dispatch(addCdp(cdpItem.toPlainObject()));
+      if (cdpIdToCheck < Number(cdpId) && cdpIdToCheck > 0) {
         dispatch(incrementFoundLowerValue());
-      } else {
+      } else if (cdpIdToCheck > Number(cdpId)) {
         dispatch(incrementFoundGreaterValue());
       }
       found++;
     }
-
     return found;
   };
 
@@ -224,6 +156,6 @@ export const useCdp = (web3: Web3, cdpId: number, selectedIlk: string, contract:
     foundLowerValue,
     searchedGreaterValue,
     foundGreaterValue,
-    jsonRpcCalled
+    jsonRpcCalled,
   };
 };

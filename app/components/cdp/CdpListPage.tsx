@@ -2,20 +2,19 @@
 
 import React, { useEffect } from 'react';
 import { Buffer } from 'buffer';
-import CdpForm from './CdpForm';
-import CdpList from './CdpList';
-import LoadingProperties from './LoadingProperties';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import CdpForm from './form/CdpForm';
+import CdpList from './list/CdpList';
+import LoadingProperties from '../loading-properties/LoadingProperties';
 import styles from './CdpListPage.module.css';
-import { useCdp } from './hooks/useCdp';
-import { useWeb3 } from './hooks/useWeb3';
-import type { RootState } from './redux/store';
+import { useCdp } from '../../hooks/useCdp';
+import { useWeb3 } from '../../hooks/useWeb3';
+import type { RootState } from '../../redux/store';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateIlk } from './redux/reducers/appSlice';
+import { updateIlk } from '../../redux/reducers/appSlice';
+import AccountStatus from '../account-status/AccountStatus';
 
 const CdpListPage: React.FC = () => {
-  const { web3, account, error, setError, contract, ilksContract, initialized } = useWeb3();
+  const { account, accountError } = useWeb3();
   const cdpId = useSelector((state: RootState) => state.app.cdpId);
   const selectedIlk = useSelector((state: RootState) => state.app.ilk);
   const {
@@ -29,24 +28,24 @@ const CdpListPage: React.FC = () => {
     searchedGreaterValue,
     foundGreaterValue,
     jsonRpcCalled,
-  } = useCdp(web3!, cdpId, selectedIlk, contract, ilksContract, setError);
+  } = useCdp(cdpId, selectedIlk);
   const dispatch = useDispatch();
   const handleIlkChange = (event: string) => {
     dispatch(updateIlk(event));
   };
 
-  const closeErrorPopup = () => {
-    setError(null);
-  };
+  // const closeErrorPopup = () => {
+  //   setError(null);
+  // };
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.Buffer = Buffer;
-    }
-    return () => {
-      stopAndResetCdpSearch(false);
-    };
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     window.Buffer = Buffer;
+  //   }
+  //   return () => {
+  //     stopAndResetCdpSearch(false);
+  //   };
+  // }, []);
 
   return (
     <div className={styles.container}>
@@ -55,35 +54,9 @@ const CdpListPage: React.FC = () => {
           <h1>DeFiNd</h1>
         </div>
       </div>
-      {error && (
-        <div className={styles.error}>
-          <span></span>{error}
-          <span className={styles.closePopupBtn} onClick={closeErrorPopup}>
-            <FontAwesomeIcon icon={faTimesCircle} />
-          </span>
-        </div>
-      )}
-      <div className={styles.accountWrapper}>
-        <div>
-          <div className={styles.accountLabel}>Account:{' '}</div>
-          <div className={styles.accountData}>
-            {account ? account : 'Not connected'}
-          </div>
-        </div>
-        <div>
-          {web3 ? (
-            <span className={`${styles.accountIcon} ${styles.verified}`}>
-              <FontAwesomeIcon icon={faCheckCircle} />
-            </span>
-          ) : (
-            <span className={`${styles.accountIcon} ${styles.notVerified}`}>
-              <FontAwesomeIcon icon={faTimesCircle} />
-            </span>
-          )}
-        </div>
-      </div>
+      <AccountStatus account={account} accountError={accountError} />
       <div>
-        {initialized && (
+        {/* {initialized && ( */}
           <div className={styles.data}>
             <span>
               <CdpForm
@@ -109,10 +82,10 @@ const CdpListPage: React.FC = () => {
               />
             </span>
             <span>
-              {web3 && <CdpList closestCdps={closestCdps} web3={web3} />}
+              <CdpList closestCdps={closestCdps} />
             </span>
           </div>
-        )}
+        {/* )} */}
       </div>
     </div>
   );
